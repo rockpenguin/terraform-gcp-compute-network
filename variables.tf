@@ -49,14 +49,14 @@ variable "subnets" {
       subnet_name                    = string
       subnet_description             = optional(string, "")
       subnet_cidr                    = string
-      subnet_purpose                 = optional(string, null)
+      subnet_purpose                 = optional(string, "PRIVATE")
       subnet_region                  = string
       subnet_role                    = optional(string, null)
       private_ip_google_access       = optional(bool, false)
       flow_logs_enabled              = optional(bool, false)
       flow_logs_aggregation_interval = optional(string, "INTERVAL_1_MIN")
       flow_logs_sampling_rate        = optional(number, 0.5)
-      flow_logs_metadata             = optional(string, "INCLUDE_ALL_METADATA")
+      flow_logs_metadata             = optional(string, "EXCLUDE_ALL_METADATA")
       flow_logs_metadata_fields      = optional(list(string), [])
       flow_logs_filter_expr          = optional(string, "true")
       secondary_ip_ranges            = optional(list(object({
