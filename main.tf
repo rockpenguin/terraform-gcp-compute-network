@@ -1,13 +1,7 @@
 ################################################################################
 # Local vars
 ################################################################################
-locals {
-  tf_subnet_names = [
-    for subnet in var.subnets : {
-      for k,v in subnet : v => replace(v, "-", "_") if k == "subnet_name"
-    }
-  ]
-}
+locals {}
 
 ################################################################################
 # Set project as a Shared VPC Host project
@@ -36,13 +30,15 @@ resource "google_compute_network" "self" {
 resource "google_compute_subnetwork" "subnet" {
   # If network_auto_subnets == false then loop through the subnets
   for_each                  = var.network_auto_subnets == false ? var.subnets : {}
-  name                      = each.value.subnet_name
-  network                   = var.network_name
   description               = each.value.subnet_description
   ip_cidr_range             = each.value.subnet_cidr
-  region                    = each.value.subnet_region
+  name                      = each.value.subnet_name
+  network                   = google_compute_network.self.id
   private_ip_google_access  = each.value.private_ip_google_access
   project                   = var.gcp_project
+  purpose                   = each.value.subnet_purpose
+  region                    = each.value.subnet_region
+  role                      = each.value.subnet_role
 
   dynamic "log_config" {
     for_each = each.value.flow_logs_enabled ? [1] : []
@@ -55,6 +51,12 @@ resource "google_compute_subnetwork" "subnet" {
     }
   }
 
-  purpose = lookup(each.value, "purpose", null)
-  role    = lookup(each.value, "role", null)
+  dynamic "secondary_ip_range" {
+    for_each = each.value.secondary_ip_ranges == null ? [] : each.value.secondary_ip_ranges
+    content {
+      range_name = secondary_ip_range.value["secondary_ip_range_name"]
+      ip_cidr_range = secondary_ip_range.value["secondary_ip_range_cidr"]
+    }
+  }
+
 }

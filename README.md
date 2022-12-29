@@ -5,7 +5,7 @@ This is a Terraform module for easily creating GCP networking resources.
 ## Usage
 ```hcl
 module "vpc" {
-  source = "./modules/terraform-gcp-compute-network"
+  source = "github.com/rockpenguin/terraform-gcp-compute-network"
 
   gcp_project             = "my-cool-project"
   gcp_region              = "us-central1"
@@ -39,6 +39,16 @@ module "vpc" {
       subnet_cidr                    = "10.15.20.0/22"
       subnet_region                  = "us-west1"
       flow_logs_enabled              = false
+      secondary_ip_ranges = [
+        {
+          secondary_ip_range_name = "secondary-cidr-01"
+          secondary_ip_range_cidr = "192.168.81.0/24"
+        },
+        {
+          secondary_ip_range_name = "secondary-cidr-02"
+          secondary_ip_range_cidr = "192.168.82.0/24"
+        }
+      ]
     }
   }
 }
@@ -58,19 +68,22 @@ module "vpc" {
 | subnets                 | Map of subnet settings (see above for usage) | complex          | (required if `network_auto_subnets` = false) |
 
 ## Subnet Variables
-| Variable                       | Description                                    | Type             | Default      |
-|--------------------------------|------------------------------------------------|------------------|--------------|
-| subnet_name                    | Name of the subnet                             | string           | (required)   |
-| subnet_description             | Description of subnet                          | string           | (optional)   |
-| subnet_cidr                    | Subnet IPv4 CIDR                               | string           | (required)   |
-| subnet_region                  | Region of the subnet                           | string           | (required)   |
-| private_ip_google_access       | Enables/disables private access to Google APIs | bool             | false        |
+| Variable                       | Description                                             | Type             | Default      |
+|--------------------------------|---------------------------------------------------------|------------------|--------------|
+| subnet_name                    | Name of the subnet                                      | string           | (required)   |
+| subnet_description             | Description of subnet                                   | string           | (optional)   |
+| subnet_cidr                    | Subnet IPv4 CIDR                                        | string           | (required)   |
+| subnet_region                  | Region of the subnet                                    | string           | (required)   |
+| private_ip_google_access       | Enables/disables private access to Google APIs          | bool             | false        |
 | flow_logs_enabled              | Enables/disables [subnet flow logging](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork#nested_log_config) | bool | false |
 | flow_logs_aggregation_interval | Interval for collecting aggregated flow logs            | string           | `INTERVAL_5_SEC` |
 | flow_logs_sampling_rate        | Sampling rate for log collection (0.0 - 1.0)            | number           | 0.5          |
 | flow_logs_metadata             | Which metadata fields should be added to collected logs | string           | `INCLUDE_ALL_METADATA` |
 | flow_logs_metadata_fields      | If `flow_logs_metadata` is `CUSTOM_METADATA` then provide list of metadata fields to be added to collected logs | list | See [VPC docs](https://cloud.google.com/vpc/docs/flow-logs#metadata) |
 | flow_logs_filter_expr          | Export filter used to define which VPC flow logs should be logged (see [examples](https://cloud.google.com/vpc/docs/flow-logs#filtering)) | string | "true" |
+| secondary_ip_ranges            | Secondary IP ranges (CIDRs) for the subnet              | list(maps)       | (optional)   |
+| secondary_ip_range_name        | Name of secondary IP range                              | string           | (see usage example) |
+| secondary_ip_range_cidr        | CIDR range of secondary IP range                        | string           | (see usage example) |
 
 ## Requirements
 

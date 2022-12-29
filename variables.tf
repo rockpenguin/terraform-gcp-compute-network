@@ -43,26 +43,26 @@ variable "shared_vpc_host_project" {
 }
 
 variable "subnets" {
-  description = "List of subnets"
+  description = "List of subnets configurations"
   type = map(
     object({
       subnet_name                    = string
       subnet_description             = optional(string, "")
       subnet_cidr                    = string
+      subnet_purpose                 = optional(string, null)
       subnet_region                  = string
+      subnet_role                    = optional(string, null)
       private_ip_google_access       = optional(bool, false)
-      flow_logs_enabled              = bool
+      flow_logs_enabled              = optional(bool, false)
       flow_logs_aggregation_interval = optional(string, "INTERVAL_1_MIN")
       flow_logs_sampling_rate        = optional(number, 0.5)
       flow_logs_metadata             = optional(string, "INCLUDE_ALL_METADATA")
       flow_logs_metadata_fields      = optional(list(string), [])
       flow_logs_filter_expr          = optional(string, "true")
+      secondary_ip_ranges            = optional(list(object({
+        secondary_ip_range_name = string
+        secondary_ip_range_cidr = string
+      })))
     })
   )
-}
-
-variable "subnet_secondary_ranges" {
-  type        = map(list(object({ range_name = string, ip_cidr_range = string })))
-  description = "Secondary ranges that will be used within subnets"
-  default     = {}
 }
