@@ -1,4 +1,4 @@
-# Terraform Module for GCP Compute Network
+# Terraform Module for GCP Compute Network/VPC
 
 This is a Terraform module for easily creating GCP networking resources.
 
