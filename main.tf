@@ -85,40 +85,40 @@ resource "google_compute_route" "route" {
 resource "google_compute_firewall" "firewall_rule" {
   for_each = var.firewall_rules
 
-  name = each.value.firewall_rule_name
-  description = each.value.firewall_rule_description
-  direction = each.value.firewall_rule_direction
+  name = each.value.fw_rule_name
+  description = each.value.fw_rule_description
+  direction = each.value.fw_rule_direction
   network = google_compute_network.self.id
-  priority = each.value.firewall_rule_priority
+  priority = each.value.fw_rule_priority
   project = var.gcp_project
 
   # Ranges
-  destination_ranges = each.value.firewall_rule_destination_ranges
-  source_ranges = each.value.firewall_rule_source_ranges
+  destination_ranges = each.value.fw_rule_destination_ranges
+  source_ranges = each.value.fw_rule_source_ranges
   # Tags
-  source_tags = each.value.firewall_rule_source_tags
-  target_tags = each.value.firewall_rule_target_tags
+  source_tags = each.value.fw_rule_source_tags
+  target_tags = each.value.fw_rule_target_tags
 
   dynamic "allow" {
-    for_each = each.value.firewall_rule_type == "allow" ? each.value.firewall_rules : []
+    for_each = each.value.fw_rule_type == "allow" ? each.value.fw_rules : []
     content {
-      ports    = allow.value["firewall_rule_ports"]
-      protocol = allow.value["firewall_rule_protocol"]
+      ports    = allow.value["fw_rule_ports"]
+      protocol = allow.value["fw_rule_protocol"]
     }
   }
 
   dynamic "deny" {
-    for_each = each.value.firewall_rule_type == "deny" ? each.value.firewall_rules : []
+    for_each = each.value.fw_rule_type == "deny" ? each.value.fw_rules : []
     content {
-      ports    = allow.value["firewall_rule_ports"]
-      protocol = allow.value["firewall_rule_protocol"]
+      ports    = allow.value["fw_rule_ports"]
+      protocol = allow.value["fw_rule_protocol"]
     }
   }
 
   dynamic "log_config" {
-    for_each = each.value.firewall_rule_logging_config != null ? [1] : []
+    for_each = each.value.fw_rule_logging_config != null ? [1] : []
     content {
-      metadata = each.value.firewall_rule_logging_config
+      metadata = each.value.fw_rule_logging_config
     }
   }
 }

@@ -1,26 +1,25 @@
 
 variable "firewall_rules" {
   description = "Network Firewall Rule"
-  default = {}
   type        = map(
     object({
-      firewall_rule_name                     = string
-      firewall_rule_description              = optional(string, "")
-      firewall_rule_direction                = optional(string, "INGRESS")
-      firewall_rule_destination_ranges       = optional(list(string))
-      firewall_rule_logging_config           = optional(string)
-      firewall_rule_priority                 = optional(number, 1000)
-      firewall_rule_type                     = string # allow or deny
-      firewall_rules                         = optional(list(
+      fw_rule_name                     = string
+      fw_rule_description              = optional(string, "")
+      fw_rule_direction                = optional(string, "INGRESS")
+      fw_rule_destination_ranges       = optional(list(string))
+      fw_rule_logging_config           = optional(string)
+      fw_rule_priority                 = optional(number, 1000)
+      fw_rule_type                     = string # allow or deny
+      fw_rules                         = optional(list(
         object({
-          firewall_rule_ports                = optional(list(string))
-          firewall_rule_protocol             = string
+          fw_rule_ports                = optional(list(string))
+          fw_rule_protocol             = string
         })))
-      firewall_rule_source_ranges            = optional(list(string))
-      firewall_rule_source_service_accounts  = optional(list(string))
-      firewall_rule_source_tags              = optional(list(string))
-      firewall_rule_target_service_accounts  = optional(list(string))
-      firewall_rule_target_tags              = optional(list(string))
+      fw_rule_source_ranges            = optional(list(string))
+      fw_rule_source_service_accounts  = optional(list(string))
+      fw_rule_source_tags              = optional(list(string))
+      fw_rule_target_service_accounts  = optional(list(string))
+      fw_rule_target_tags              = optional(list(string))
     })
   )
 }
