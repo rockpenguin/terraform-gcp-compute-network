@@ -21,7 +21,7 @@ resource "google_compute_network" "self" {
   auto_create_subnetworks         = var.network_auto_subnets
   routing_mode                    = var.network_routing_mode
   mtu                             = var.network_mtu
-  delete_default_routes_on_create = false
+  delete_default_routes_on_create = var.network_delete_default_routes
 }
 
 ################################################################################
@@ -59,4 +59,66 @@ resource "google_compute_subnetwork" "subnet" {
     }
   }
 
+}
+
+################################################################################
+# Routes
+################################################################################
+resource "google_compute_route" "route" {
+  for_each = var.network_routes
+
+  name              = each.value.route_name
+  description       = each.value.route_description
+  dest_range        = each.value.route_dest_range
+  network           = google_compute_network.self.id
+  next_hop_gateway  = each.value.route_next_hop_gateway
+  next_hop_instance = each.value.route_next_hop_instance
+  next_hop_ip       = each.value.route_next_hop_ip
+  priority          = each.value.route_priority
+  project           = var.gcp_project
+  tags              = each.value.route_tags
+}
+
+################################################################################
+# Firewall Rules
+################################################################################
+resource "google_compute_firewall" "firewall_rule" {
+  for_each = var.firewall_rules
+
+  name = each.value.fw_rule_name
+  description = each.value.fw_rule_description
+  direction = each.value.fw_rule_direction
+  network = google_compute_network.self.id
+  priority = each.value.fw_rule_priority
+  project = var.gcp_project
+
+  # Ranges
+  destination_ranges = each.value.fw_rule_destination_ranges
+  source_ranges = each.value.fw_rule_source_ranges
+  # Tags
+  source_tags = each.value.fw_rule_source_tags
+  target_tags = each.value.fw_rule_target_tags
+
+  dynamic "allow" {
+    for_each = each.value.fw_rule_type == "allow" ? each.value.fw_rules : []
+    content {
+      ports    = allow.value["fw_rule_ports"]
+      protocol = allow.value["fw_rule_protocol"]
+    }
+  }
+
+  dynamic "deny" {
+    for_each = each.value.fw_rule_type == "deny" ? each.value.fw_rules : []
+    content {
+      ports    = allow.value["fw_rule_ports"]
+      protocol = allow.value["fw_rule_protocol"]
+    }
+  }
+
+  dynamic "log_config" {
+    for_each = each.value.fw_rule_logging_config != null ? [1] : []
+    content {
+      metadata = each.value.fw_rule_logging_config
+    }
+  }
 }
